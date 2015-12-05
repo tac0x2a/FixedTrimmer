@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FixedTrimmer</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="Description">Setting trim pos</string>
+    <string name="x1y1">x1y1</string>
+    <string name="x2y2">x2y2</string>
+    <string name="SaveButtonText">Save</string>
+</resources>
