@@ -72,17 +72,25 @@ public class MainActivity extends AppCompatActivity {
         if(intent.getType() == null) return;
         if(! intent.getType().startsWith("image/")) return;
 
+        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri == null) return;
+
         try{
-            procImage(intent);
+            Uri savedUri = procImage(imageUri);
+
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(android.content.Intent.ACTION_SEND);
+            sendIntent.setDataAndType(savedUri, "image/*");
+            sendIntent.putExtra(Intent.EXTRA_STREAM, savedUri);
+            startActivity(sendIntent);
+
             finish();
         } catch(Exception ex){
             Toast.makeText(MainActivity.this, ex.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
-    private void procImage(Intent imageIntent) throws IOException {
-        Uri imageUri = (Uri) imageIntent.getParcelableExtra(Intent.EXTRA_STREAM);
-        if (imageUri == null) return;
+    private Uri procImage(Uri imageUri) throws IOException {
 
         //Toast.makeText(MainActivity.this, "" + imageUri, Toast.LENGTH_LONG).show();
 
@@ -104,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
         String dirPath =
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
 
-
         File dir =new File(dirPath);
         if(! dir.exists()){
             dir.mkdirs();
@@ -116,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
 
         // 保存処理開始
         FileOutputStream fos = null;
-        fos = new FileOutputStream(new File(dirPath, fileName.format(mDate) + ".jpg"));
+        File outputFile = new File(dirPath, fileName.format(mDate) + ".png");
+        fos = new FileOutputStream(outputFile);
 
         // PNGで保存
         image.compress(Bitmap.CompressFormat.PNG, 100, fos);
@@ -126,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Toast.makeText(MainActivity.this, "Save:" + dirPath + "/" + fileName, Toast.LENGTH_LONG).show();
 
+        return Uri.fromFile(outputFile);
     }
 
     private Bitmap getBitmapFromUri(Uri uri)throws IOException {
